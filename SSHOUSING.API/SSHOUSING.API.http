@@ -1,0 +1,6 @@
+@SSHOUSING.API_HostAddress = http://localhost:5082
+
+GET {{SSHOUSING.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
