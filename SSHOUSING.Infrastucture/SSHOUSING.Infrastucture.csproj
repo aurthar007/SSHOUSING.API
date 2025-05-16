@@ -15,4 +15,8 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\SSHOUSING.Domain\SSHOUSING.Domain.csproj" />
+  </ItemGroup>
+
 </Project>
