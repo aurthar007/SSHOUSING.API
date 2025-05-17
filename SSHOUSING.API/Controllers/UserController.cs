@@ -32,22 +32,19 @@ namespace SSHOUSING.API.Controllers
         [HttpPost("AddUser")]
         public IActionResult AddUser(User user)
         {
-            var result = _user.Create(user);
-            return Ok(result);
+            return Ok(_user.Create(user));
         }
 
         [HttpPut("UpdateUser")]
         public IActionResult UpdateUser(User user)
         {
-            var result = _user.Update(user);
-            return Ok(result);
+            return Ok(_user.Update(user));
         }
 
         [HttpDelete("DeleteUser/{id}")]
         public IActionResult DeleteUser(int id)
         {
-            var result = _user.Delete(id);
-            return Ok(result);
+            return Ok(_user.Delete(id));
         }
     }
 }
