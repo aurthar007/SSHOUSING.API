@@ -11,8 +11,8 @@ using SSHOUSING.Infrastucture;
 namespace SSHOUSING.Infrastucture.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250517034519_user")]
-    partial class user
+    [Migration("20250517084758_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
