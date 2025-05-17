@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using SSHOUSING.Domain.Entities;
 using SSHOUSING.Domain.Interface;
 
@@ -25,32 +24,27 @@ namespace SSHOUSING.API.Controllers
         [HttpGet("GetDistrictById/{id}")]
         public IActionResult GetDistrictById(int id)
         {
-            var district = _district.GetById(id);
-            if (district == null) return NotFound();
-            return Ok(district);
+            var result = _district.GetById(id);
+            if (result == null) return NotFound();
+            return Ok(result);
         }
 
         [HttpPost("AddDistrict")]
         public IActionResult AddDistrict(District district)
         {
-            _district.Add(district);
-            return Ok();
+            return Ok(_district.Add(district));
         }
 
         [HttpPut("UpdateDistrict")]
         public IActionResult UpdateDistrict(District district)
         {
-            var result = _district.Update(district);
-            if (result) return Ok();
-            return NotFound();
+            return Ok(_district.Update(district));
         }
 
         [HttpDelete("DeleteDistrict/{id}")]
         public IActionResult DeleteDistrict(int id)
         {
-            var result = _district.Delete(id);
-            if (result) return Ok();
-            return NotFound();
+            return Ok(_district.Delete(id));
         }
     }
 }
