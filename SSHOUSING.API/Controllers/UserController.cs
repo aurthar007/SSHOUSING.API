@@ -1,50 +1,81 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using SSHOUSING.Domain.Entities;
-using SSHOUSING.Domain.Interface;
+﻿using JWTTokendemo.DTO;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
+using SSHOUSING.Infrastucture;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace SSHOUSING.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UserController : ControllerBase
+    public class UsersController : ControllerBase
     {
-        private readonly IUser _user;
+        private readonly ApplicationDbContext _context;
+        private readonly IConfiguration _configuration;
 
-        public UserController(IUser user)
+        public UsersController(ApplicationDbContext context, IConfiguration configuration)
         {
-            _user = user;
+            _context = context;
+            _configuration = configuration;
+        }
+
+        [HttpPost("register")]
+        public IActionResult Register([FromBody] User user)
+        {
+            if (_context.Users.Any(x => x.Email == user.Email))
+                return BadRequest("User with this email already exists.");
+
+            _context.Users.Add(user);
+            _context.SaveChanges();
+
+            return Ok("User registered successfully!");
+        }
+
+        [HttpPost("login")]
+        public IActionResult Login([FromBody] LoginRequest login)
+        {
+            var user = _context.Users.FirstOrDefault(u => u.Email == login.Email && u.Password == login.Password);
+
+            if (user == null)
+                return Unauthorized("Invalid credentials");
+
+            var claims = new[]
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+                new Claim("userId", user.Id.ToString()),
+                new Claim("firstname", user.Firstname) 
+            };
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var token = new JwtSecurityToken(
+                issuer: _configuration["Jwt:Issuer"],
+                audience: _configuration["Jwt:Audience"],
+                claims: claims,
+                expires: DateTime.Now.AddHours(Convert.ToDouble(_configuration["Jwt:ExpiresInHours"])),
+                signingCredentials: creds
+            );
+
+            var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
+
+            return Ok(new { token = tokenString });
         }
 
         [HttpGet("GetAllUsers")]
-        public IActionResult GetAllUsers()
+        public IActionResult GetAll()
         {
-            return Ok(_user.GetAll());
-        }
+            var users = _context.Users.Select(u => new
+            {
+                u.Id,
+                u.Email,
+                FullName = u.Firstname + " " + u.Lastname
+            }).ToList();
 
-        [HttpGet("GetUserById/{id}")]
-        public IActionResult GetUserById(int id)
-        {
-            var result = _user.GetById(id);
-            if (result == null) return NotFound();
-            return Ok(result);
-        }
-
-        [HttpPost("AddUser")]
-        public IActionResult AddUser(User user)
-        {
-            return Ok(_user.Create(user));
-        }
-
-        [HttpPut("UpdateUser")]
-        public IActionResult UpdateUser(User user)
-        {
-            return Ok(_user.Update(user));
-        }
-
-        [HttpDelete("DeleteUser/{id}")]
-        public IActionResult DeleteUser(int id)
-        {
-            return Ok(_user.Delete(id));
+            return Ok(users);
         }
     }
 }
