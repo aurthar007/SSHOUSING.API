@@ -7,7 +7,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace JWTTokendemo.Controllers
+namespace SSHOUSING.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -28,7 +28,7 @@ namespace JWTTokendemo.Controllers
             if (_context.Users.Any(x => x.Email == user.Email))
                 return BadRequest("User with this email already exists.");
 
-            _context.Users.Add(user); 
+            _context.Users.Add(user);
             _context.SaveChanges();
 
             return Ok("User registered successfully!");
@@ -44,10 +44,10 @@ namespace JWTTokendemo.Controllers
 
             var claims = new[]
             {
-        new Claim(JwtRegisteredClaimNames.Sub, user.Email),
-        new Claim("userId", user.Id.ToString()),
-        new Claim("username", user.Username)
-    };
+                new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+                new Claim("userId", user.Id.ToString()),
+                new Claim("firstname", user.Firstname) 
+            };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -62,10 +62,8 @@ namespace JWTTokendemo.Controllers
 
             var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
 
-     
             return Ok(new { token = tokenString });
         }
-
 
         [HttpGet("GetAllUsers")]
         public IActionResult GetAll()
@@ -74,7 +72,7 @@ namespace JWTTokendemo.Controllers
             {
                 u.Id,
                 u.Email,
-                u.Username
+                FullName = u.Firstname + " " + u.Lastname
             }).ToList();
 
             return Ok(users);

@@ -11,7 +11,7 @@ using SSHOUSING.Infrastucture;
 namespace SSHOUSING.Infrastucture.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250517084758_initial")]
+    [Migration("20250518034434_initial")]
     partial class initial
     {
         /// <inheritdoc />
@@ -94,18 +94,24 @@ namespace SSHOUSING.Infrastucture.Migrations
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Firstname")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Lastname")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Mobile")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<string>("Password")
                         .IsRequired()
-                        .HasMaxLength(80)
-                        .HasColumnType("nvarchar(80)");
-
-                    b.Property<string>("Username")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 

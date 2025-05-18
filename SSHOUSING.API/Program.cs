@@ -14,7 +14,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddScoped<ICountry, CountryRepository>();
 builder.Services.AddScoped<IState, StateRepository>();
 builder.Services.AddScoped<IDistrict, DistrictRepository>();
-builder.Services.AddScoped<IUser, UserRepository>();
+
 
 builder.Services.AddAuthentication("Bearer")
     .AddJwtBearer("Bearer", options =>
