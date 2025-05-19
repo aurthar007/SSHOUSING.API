@@ -2,7 +2,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using SSHOUSING.Infrastucture;
+using System;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
+using System.Text;
+using Microsoft.IdentityModel.Tokens;
 
 namespace SSHOUSING.API.Controllers
 {
@@ -30,6 +35,7 @@ namespace SSHOUSING.API.Controllers
 
             return Ok("User registered successfully!");
         }
+
         [HttpPost("login")]
         public IActionResult Login([FromBody] LoginRequest login)
         {
@@ -38,9 +44,29 @@ namespace SSHOUSING.API.Controllers
             if (user == null)
                 return Unauthorized("Invalid email or password");
 
+            var claims = new[]
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+                new Claim("userId", user.Id.ToString())
+            };
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var token = new JwtSecurityToken(
+                issuer: _configuration["Jwt:Issuer"],
+                audience: _configuration["Jwt:Audience"],
+                claims: claims,
+                expires: DateTime.Now.AddHours(Convert.ToDouble(_configuration["Jwt:ExpiresInHours"])),
+                signingCredentials: creds
+            );
+
+            var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
+
             return Ok(new
             {
                 message = "Login successful",
+                token = tokenString,
                 user = new
                 {
                     user.Id,
