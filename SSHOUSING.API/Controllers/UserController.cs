@@ -1,11 +1,8 @@
 ﻿using JWTTokendemo.DTO;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
 using SSHOUSING.Infrastucture;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
+using System.Linq;
 
 namespace SSHOUSING.API.Controllers
 {
@@ -34,45 +31,14 @@ namespace SSHOUSING.API.Controllers
             return Ok("User registered successfully!");
         }
 
-        [HttpPost("login")]
-        public IActionResult Login([FromBody] LoginRequest login)
-        {
-            var user = _context.Users.FirstOrDefault(u => u.Email == login.Email && u.Password == login.Password);
-
-            if (user == null)
-                return Unauthorized("Invalid credentials");
-
-            var claims = new[]
-            {
-                new Claim(JwtRegisteredClaimNames.Sub, user.Email),
-                new Claim("userId", user.Id.ToString()),
-                new Claim("firstname", user.Firstname) 
-            };
-
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-            var token = new JwtSecurityToken(
-                issuer: _configuration["Jwt:Issuer"],
-                audience: _configuration["Jwt:Audience"],
-                claims: claims,
-                expires: DateTime.Now.AddHours(Convert.ToDouble(_configuration["Jwt:ExpiresInHours"])),
-                signingCredentials: creds
-            );
-
-            var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
-
-            return Ok(new { token = tokenString });
-        }
-
         [HttpGet("GetAllUsers")]
         public IActionResult GetAll()
         {
             var users = _context.Users.Select(u => new
             {
                 u.Id,
-                u.Email,
-                FullName = u.Firstname + " " + u.Lastname
+                u.Username,
+                u.Email
             }).ToList();
 
             return Ok(users);
