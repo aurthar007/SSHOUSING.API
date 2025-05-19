@@ -30,18 +30,24 @@ namespace SSHOUSING.API.Controllers
 
             return Ok("User registered successfully!");
         }
-
-        [HttpGet("GetAllUsers")]
-        public IActionResult GetAll()
+        [HttpPost("login")]
+        public IActionResult Login([FromBody] LoginRequest login)
         {
-            var users = _context.Users.Select(u => new
-            {
-                u.Id,
-                u.Username,
-                u.Email
-            }).ToList();
+            var user = _context.Users.FirstOrDefault(u => u.Email == login.Email && u.Password == login.Password);
 
-            return Ok(users);
+            if (user == null)
+                return Unauthorized("Invalid email or password");
+
+            return Ok(new
+            {
+                message = "Login successful",
+                user = new
+                {
+                    user.Id,
+                    user.Username,
+                    user.Email
+                }
+            });
         }
     }
 }
