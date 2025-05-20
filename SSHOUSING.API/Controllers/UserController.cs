@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SSHOUSING.Domain.Entities;
+using SSHOUSING.Domain.Interface;
 
 namespace SSHOUSING.API.Controllers
 {
+    [Route("api/[controller]")]
+    [ApiController]
     public class UserController : ControllerBase
     {
         private readonly IUser _user;
@@ -15,33 +18,38 @@ namespace SSHOUSING.API.Controllers
         [HttpGet("GetAllUsers")]
         public IActionResult GetAllUsers()
         {
-            return Ok(_user.GetAll());
+            var result = _user.GetAll();
+            return Ok(result);
         }
 
         [HttpGet("GetUserById/{id}")]
         public IActionResult GetUserById(int id)
         {
             var result = _user.GetById(id);
-            if (result == null) return NotFound();
+            if (result == null)
+                return NotFound();
             return Ok(result);
         }
 
         [HttpPost("AddUser")]
         public IActionResult AddUser(User user)
         {
-            return Ok(_user.Create(user));
+            var result = _user.Create(user);
+            return Ok(result);
         }
 
         [HttpPut("UpdateUser")]
         public IActionResult UpdateUser(User user)
         {
-            return Ok(_user.Update(user));
+            var result = _user.Update(user);
+            return Ok(result);
         }
 
         [HttpDelete("DeleteUser/{id}")]
         public IActionResult DeleteUser(int id)
         {
-            return Ok(_user.Delete(id));
+            var result = _user.Delete(id);
+            return Ok(result);
         }
     }
 }
