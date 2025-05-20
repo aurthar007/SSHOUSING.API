@@ -4,8 +4,10 @@ namespace SSHOUSING.Domain.Interface
 {
     public interface IUser
     {
-        bool AddUser(User user);
-        User Login(string email, string password);
-
+        List<User> GetAll();
+        User GetById(int id);
+        bool Add(User user);
+        bool Update(User user);
+        bool Delete(int id);
     }
 }
