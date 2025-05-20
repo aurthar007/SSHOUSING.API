@@ -9,42 +9,51 @@ namespace SSHOUSING.API.Controllers
     public class RoleController : ControllerBase
     {
         private readonly IRole _role;
-
         public RoleController(IRole role)
         {
             _role = role;
         }
-
-        [HttpGet("GetAllRoles")]
-        public IActionResult GetAllRoles()
-        {
-            return Ok(_role.GetAll());
-        }
-
-        [HttpGet("GetRoleById/{id}")]
-        public IActionResult GetRoleById(int id)
-        {
-            var result = _role.GetById(id);
-            if (result == null) return NotFound();
-            return Ok(result);
-        }
-
         [HttpPost("AddRole")]
         public IActionResult AddRole(Role role)
         {
-            return Ok(_role.Create(role));
+            if (role == null)
+                return BadRequest("Invalid Role data.");
+            var result = _role.AddRole(role);
+            return Ok("Role added successfully.");
+        }
+        [HttpGet("GetAllRole")]
+        public IActionResult GetAllRole()
+        {
+            return Ok(_role.GetAllRole());
         }
 
-        [HttpPut("UpdateRole")]
-        public IActionResult UpdateRole(Role role)
+        [HttpGet("GetRoleById/{id}")]
+        public IActionResult GetRole(int id)
         {
-            return Ok(_role.Update(role));
+            var role = _role.GetRoleById(id);
+            if (role == null)
+                return NotFound($"role with ID {id} not found.");
+
+            return Ok(role);
+        }
+
+        [HttpPut("UpdateRole/{id}")]
+        public IActionResult UpdateRole(int id, Role role)
+        {
+            if (role == null || role.Id != id)
+                return BadRequest("Invalid role data.");
+            var result = _role.UpdateRole(role);
+            return Ok("Role updated successfully.");
+
         }
 
         [HttpDelete("DeleteRole/{id}")]
-        public IActionResult DeleteRole(int id)
+        public IActionResult DeleteCountry(int id)
         {
-            return Ok(_role.Delete(id));
+            var result = _role.DeleteRole(id);
+            return Ok("Role deleted successfully.");
         }
+
+
     }
 }
