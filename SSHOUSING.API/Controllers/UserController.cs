@@ -1,79 +1,56 @@
 ﻿using JWTTokendemo.DTO;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
+using SSHOUSING.Domain.Entities;
 using SSHOUSING.Infrastucture;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using Microsoft.IdentityModel.Tokens;
 
 namespace SSHOUSING.API.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class UsersController : ControllerBase
+    public class UserController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
-        private readonly IConfiguration _configuration;
+        private readonly IUser _user;
 
-        public UsersController(ApplicationDbContext context, IConfiguration configuration)
+        public UserController(IUser user)
         {
-            _context = context;
-            _configuration = configuration;
+            _user = user;
         }
 
-        [HttpPost("register")]
-        public IActionResult Register([FromBody] User user)
+        [HttpGet("GetAllUsers")]
+        public IActionResult GetAllUsers()
         {
-            if (_context.Users.Any(x => x.Email == user.Email))
-                return BadRequest("User with this email already exists.");
-
-            _context.Users.Add(user);
-            _context.SaveChanges();
-
-            return Ok("User registered successfully!");
+            return Ok(_user.GetAll());
         }
 
-        [HttpPost("login")]
-        public IActionResult Login([FromBody] LoginRequest login)
+        [HttpGet("GetUserById/{id}")]
+        public IActionResult GetUserById(int id)
         {
-            var user = _context.Users.FirstOrDefault(u => u.Email == login.Email && u.Password == login.Password);
+            var result = _user.GetById(id);
+            if (result == null) return NotFound();
+            return Ok(result);
+        }
 
-            if (user == null)
-                return Unauthorized("Invalid email or password");
+        [HttpPost("AddUser")]
+        public IActionResult AddUser(User user)
+        {
+            return Ok(_user.Create(user));
+        }
 
-            var claims = new[]
-            {
-                new Claim(JwtRegisteredClaimNames.Sub, user.Email),
-                new Claim("userId", user.Id.ToString())
-            };
+        [HttpPut("UpdateUser")]
+        public IActionResult UpdateUser(User user)
+        {
+            return Ok(_user.Update(user));
+        }
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-            var token = new JwtSecurityToken(
-                issuer: _configuration["Jwt:Issuer"],
-                audience: _configuration["Jwt:Audience"],
-                claims: claims,
-                expires: DateTime.Now.AddHours(Convert.ToDouble(_configuration["Jwt:ExpiresInHours"])),
-                signingCredentials: creds
-            );
-
-            var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
-
-            return Ok(new
-            {
-                message = "Login successful",
-                token = tokenString,
-                user = new
-                {
-                    user.Id,
-                    user.Username,
-                    user.Email
-                }
-            });
+        [HttpDelete("DeleteUser/{id}")]
+        public IActionResult DeleteUser(int id)
+        {
+            return Ok(_user.Delete(id));
         }
     }
 }
