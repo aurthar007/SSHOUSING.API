@@ -29,11 +29,19 @@ namespace SSHOUSING.API.Controllers
             return Ok(user);
         }
 
-        [HttpPost("AddUser")]
-        public IActionResult AddUser(User user)
+        [HttpPost("RegisterUser")]
+        public IActionResult RegisterUser(User user)
         {
+            // Check if the email already exists
+            var existingUser = _user.GetAll().FirstOrDefault(u => u.Email == user.Email);
+            if (existingUser != null)
+            {
+                return BadRequest("Email is already in use.");
+            }
+
+            // If no existing user, create the new user
             var result = _user.Create(user);
-            return result ? Ok("User created successfully.") : BadRequest("Failed to create user.");
+            return result ? Ok("User registered successfully.") : BadRequest("Failed to register user.");
         }
 
         [HttpPut("UpdateUser")]
@@ -49,5 +57,7 @@ namespace SSHOUSING.API.Controllers
             var result = _user.Delete(id);
             return result ? Ok("User deleted successfully.") : NotFound("User not found.");
         }
+ 
+
     }
 }

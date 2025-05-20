@@ -1,6 +1,6 @@
-﻿
-
-using SSHOUSING.Domain.Interface;
+﻿using SSHOUSING.Domain.Interface;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SSHOUSING.Infrastucture.Repository
 {
