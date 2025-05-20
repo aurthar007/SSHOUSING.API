@@ -1,14 +1,5 @@
-﻿using JWTTokendemo.DTO;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.AspNetCore.Mvc;
 using SSHOUSING.Domain.Entities;
-using SSHOUSING.Infrastucture;
-using System;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Security.Claims;
-using System.Text;
 
 namespace SSHOUSING.API.Controllers
 {
