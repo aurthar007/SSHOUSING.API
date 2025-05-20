@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
-using SSHOUSING.API.DTO; // For LoginRegister
-using JWTTokendemo.DTO;  // For LoginRequest
+using SSHOUSING.API.DTO; 
+using JWTTokendemo.DTO;  
 using SSHOUSING.Domain.Entities;
 using SSHOUSING.Domain.Interface;
 using System.IdentityModel.Tokens.Jwt;
