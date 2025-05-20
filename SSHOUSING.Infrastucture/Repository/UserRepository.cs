@@ -1,9 +1,6 @@
-﻿using SSHOUSING.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
+
+using SSHOUSING.Domain.Interface;
 
 namespace SSHOUSING.Infrastucture.Repository
 {
@@ -16,15 +13,9 @@ namespace SSHOUSING.Infrastucture.Repository
             _context = context;
         }
 
-        public IEnumerable<User> GetAll()
-        {
-            return _context.Users.ToList();
-        }
+        public IEnumerable<User> GetAll() => _context.Users.ToList();
 
-        public User GetById(int id)
-        {
-            return _context.Users.Find(id);
-        }
+        public User GetById(int id) => _context.Users.Find(id);
 
         public bool Create(User user)
         {
@@ -44,7 +35,6 @@ namespace SSHOUSING.Infrastucture.Repository
         {
             var user = _context.Users.Find(id);
             if (user == null) return false;
-
             _context.Users.Remove(user);
             _context.SaveChanges();
             return true;
