@@ -8,68 +8,42 @@ namespace SSHOUSING.Infrastucture.Repository
     public class RoleRepository : IRole
     {
         private readonly ApplicationDbContext _context;
-
         public RoleRepository(ApplicationDbContext context)
         {
-            _context = context; // This is where the ApplicationDbContext is injected
+            _context = context;
         }
 
-        public IEnumerable<Role> GetAll()
+        public bool AddRole(Role role)
         {
-            return _context.Roles.ToList(); // Fetching all roles from the database
-        }
-
-        public Role GetById(int id)
-        {
-            return _context.Roles.Find(id); // Finding role by ID in the database
-        }
-
-        public bool Create(Role role)
-        {
-            _context.Roles.Add(role); // Adding new role to the context
-            _context.SaveChanges(); // Saving changes to the database
+            _context.Roles.Add(role);
+            _context.SaveChanges();
             return true;
         }
 
-        public bool Update(Role role)
+        public bool DeleteRole(int Id)
         {
-            _context.Roles.Update(role); // Updating existing role
-            _context.SaveChanges(); // Saving changes
-            return true;
-        }
-
-        public bool Delete(int id)
-        {
-            var role = _context.Roles.Find(id); // Finding the role to delete
-            if (role == null) return false;
-            _context.Roles.Remove(role); // Removing the role from context
-            _context.SaveChanges(); // Saving changes
+            var d = _context.Roles.Find(Id);
+            _context.Roles.Remove(d);
+            _context.SaveChanges();
             return true;
         }
 
         public List<Role> GetAllRole()
         {
-            throw new NotImplementedException();
+            return _context.Roles.ToList();
         }
 
         public Role GetRoleById(int Id)
         {
-            throw new NotImplementedException();
-        }
-
-        public bool AddRole(Role role)
-        {
-            throw new NotImplementedException();
+            return _context.Roles.Find(Id);
         }
 
         public bool UpdateRole(Role role)
         {
-            throw new NotImplementedException();
+            _context.Roles.Update(role);
+            _context.SaveChanges();
+            return true;
         }
 
-        public bool DeleteRole(int Id)
-        {
-            throw new NotImplementedException();
-        }
     }
 }
