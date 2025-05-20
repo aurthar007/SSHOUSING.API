@@ -45,29 +45,5 @@ namespace SSHOUSING.Infrastucture.Repository
             return true;
         }
 
-        public List<Role> GetAllRole()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Role GetRoleById(int Id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool AddRole(Role role)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool UpdateRole(Role role)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool DeleteRole(int Id)
-        {
-            throw new NotImplementedException();
-        }
     }
 }
