@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SSHOUSING.API.DTO; // For LoginRegister
+using SSHOUSING.API.DTO; 
+using JWTTokendemo.DTO; 
 using SSHOUSING.Domain.Entities;
 using SSHOUSING.Domain.Interface;
 
@@ -34,5 +35,24 @@ namespace SSHOUSING.API.Controllers
             var result = _user.AddUser(user);
             return Ok("Registered successfully.");
         }
+        [HttpPost("Login")]
+        public IActionResult Login(LoginRequest loginRequest)
+        {
+            var user = _user.Login(loginRequest.Email, loginRequest.Password);
+
+            if (user == null)
+                return Ok(new { name = "", role = "", success = "400" });
+
+            var userRole = _userRole.GetById(user.Id);
+
+            if (userRole == null)
+                return Ok(new { name = "", role = "", success = "401" });
+
+            var role = _role.GetRoleById(userRole.RoleId);
+
+            return Ok(new { user = user, role = role, success = "200" });
+        }
+        
+        }
     }
-}
+
