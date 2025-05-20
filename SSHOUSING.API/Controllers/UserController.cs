@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SSHOUSING.Domain.Entities;
-using SSHOUSING.Domain.Interface;
+using SSHOUSING.Infrastucture;
+using System.Linq;
 
 namespace SSHOUSING.API.Controllers
 {
@@ -8,56 +9,26 @@ namespace SSHOUSING.API.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly IUser _user;
+        private readonly ApplicationDbContext _context;
 
-        public UserController(IUser user)
+        public UserController(ApplicationDbContext context)
         {
-            _user= user;
+            _context = context;
         }
 
-        [HttpGet("GetAllUsers")]
-        public IActionResult GetAllUsers()
-        {
-            return Ok(_user.GetAll());
-        }
-
-        [HttpGet("GetUserById/{id}")]
-        public IActionResult GetUserById(int id)
-        {
-            var user = _user.GetById(id);
-            if (user == null) return NotFound();
-            return Ok(user);
-        }
-
+        // Register a new user
         [HttpPost("RegisterUser")]
         public IActionResult RegisterUser(User user)
         {
             // Check if the email already exists
-            var existingUser = _user.GetAll().FirstOrDefault(u => u.Email == user.Email);
+            var existingUser = _context.Users.FirstOrDefault(u => u.Email == user.Email);
             if (existingUser != null)
-            {
                 return BadRequest("Email is already in use.");
-            }
 
-            // If no existing user, create the new user
-            var result = _user.Create(user);
-            return result ? Ok("User registered successfully.") : BadRequest("Failed to register user.");
+            // Add the new user and save to the database
+            _context.Users.Add(user);
+            _context.SaveChanges();
+            return Ok("User registered successfully.");
         }
-
-        [HttpPut("UpdateUser")]
-        public IActionResult UpdateUser(User user)
-        {
-            var result = _user.Update(user);
-            return result ? Ok("User updated successfully.") : NotFound("User not found.");
-        }
-
-        [HttpDelete("DeleteUser/{id}")]
-        public IActionResult DeleteUser(int id)
-        {
-            var result = _user.Delete(id);
-            return result ? Ok("User deleted successfully.") : NotFound("User not found.");
-        }
- 
-
     }
 }
