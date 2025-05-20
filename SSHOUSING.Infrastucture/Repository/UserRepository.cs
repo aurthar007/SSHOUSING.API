@@ -15,7 +15,7 @@ namespace SSHOUSING.Infrastucture.Repository
 
         public bool Create(User user)
         {
-            // Check if the email already exists
+           
             var existingUser = _context.Users.FirstOrDefault(u => u.Email == user.Email);
             if (existingUser != null)
                 return false; 
@@ -23,7 +23,7 @@ namespace SSHOUSING.Infrastucture.Repository
         
             _context.Users.Add(user);
             _context.SaveChanges();
-            return true; // Registration successful
+            return true;
         }
 
         public User GetByEmailAndPassword(string email, string password)

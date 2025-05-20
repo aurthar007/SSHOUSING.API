@@ -63,7 +63,6 @@ namespace SSHOUSING.API.Controllers
             return Ok(new { token = jwt, user = user, role = role, success = "200" });
         }
 
-        // ✅ Get All Users
         [HttpGet("GetAllUsers")]
         public IActionResult GetAllUsers()
         {
