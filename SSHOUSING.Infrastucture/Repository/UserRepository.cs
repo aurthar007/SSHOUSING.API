@@ -25,5 +25,11 @@ namespace SSHOUSING.Infrastucture.Repository
             _context.SaveChanges();
             return true; // Registration successful
         }
+
+        public User GetByEmailAndPassword(string email, string password)
+        {
+            
+            return _context.Users.FirstOrDefault(u => u.Email == email && u.Password == password);
+        }
     }
 }

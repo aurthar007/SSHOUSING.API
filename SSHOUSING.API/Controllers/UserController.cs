@@ -30,5 +30,15 @@ namespace SSHOUSING.API.Controllers
             _context.SaveChanges();
             return Ok("User registered successfully.");
         }
+        [HttpPost("LoginUser")]
+        public IActionResult LoginUser([FromBody] User loginRequest)
+        {
+            // Find user by email and password
+            var user = _context.Users.FirstOrDefault(u => u.Email == loginRequest.Email && u.Password == loginRequest.Password);
+            if (user == null)
+                return Unauthorized("Invalid email or password.");
+
+            return Ok("Login successful.");
+        }
     }
 }
