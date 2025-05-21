@@ -9,10 +9,10 @@ namespace SSHOUSING.Domain.Interface
 {
     public interface ICountry
     {
-        List<Country> GetAll();
-        Country GetById(int id);
-        bool Add(Country country);
-        bool Update(Country country);
-        bool Delete(int id);
+        List<Country> GetAllCountry();
+        Country GetCountryById(int Id);
+        bool AddCountry(Country country);
+        bool UpdateCountry(Country country);
+        bool DeleteCountry(int Id);
     }
 }
