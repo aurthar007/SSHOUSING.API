@@ -11,46 +11,41 @@ namespace SSHOUSING.Infrastucture.Repository
     public class StateRepository : IState
     {
         private readonly ApplicationDbContext _context;
-
         public StateRepository(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        public bool Add(State state)
+        public bool AddState(State state)
         {
             _context.States.Add(state);
             _context.SaveChanges();
             return true;
         }
 
-        public bool Delete(int id)
+        public bool DeleteState(int Id)
         {
-            var state = _context.States.Find(id);
-            if (state == null) return false;
-
-            _context.States.Remove(state);
+            var d = _context.States.Find(Id);
+            _context.States.Remove(d);
             _context.SaveChanges();
             return true;
         }
 
-        public List<State> GetAll()
+        public List<State> GetAllState()
         {
             return _context.States.ToList();
         }
 
-        public State GetById(int id)
+        public State GetStateById(int Id)
         {
-            return _context.States.Find(id);
+            return _context.States.Find(Id);
         }
 
-          public bool Update(State state)
+        public bool UpdateState(State state)
         {
             _context.States.Update(state);
             _context.SaveChanges();
             return true;
         }
-
     }
-
 }
