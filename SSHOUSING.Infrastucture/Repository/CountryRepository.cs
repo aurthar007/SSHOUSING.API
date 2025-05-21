@@ -1,53 +1,50 @@
 ﻿using SSHOUSING.Domain.Entities;
 using SSHOUSING.Domain.Interface;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SSHOUSING.Infrastucture.Repository
 {
-
-    public class CountryRepository : ICountry
+   public class CountryRepository : ICountry
     {
-        private readonly ApplicationDbContext _context;
 
+        private readonly ApplicationDbContext _context;
         public CountryRepository(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        public bool Add(Country country)
+        public bool AddCountry(Country country)
         {
             _context.Countries.Add(country);
             _context.SaveChanges();
             return true;
         }
 
-        public bool Delete(int id)
+        public bool DeleteCountry(int Id)
         {
-            var country = _context.Countries.Find(id);
-            _context.Countries.Remove(country);
+            var d = _context.Countries.Find(Id);
+            _context.Countries.Remove(d);
             _context.SaveChanges();
             return true;
         }
 
-        public List<Country> GetAll()
-        {
-            return _context.Countries.ToList();
-        }
-
-        public Country GetById(int id)
-        {
-            return _context.Countries.Find(id);
-        }
-
-        public bool Update(Country country)
+        public bool UpdateCountry(Country country)
         {
             _context.Countries.Update(country);
             _context.SaveChanges();
             return true;
         }
+
+        public List<Country> GetAllCountry()
+        {
+            return _context.Countries.ToList();
+        }
+
+        public Country GetCountryById(int Id)
+        {
+            return _context.Countries.Find(Id);
+        }
+
+
     }
 }
