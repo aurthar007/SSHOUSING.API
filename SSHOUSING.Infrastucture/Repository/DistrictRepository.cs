@@ -11,42 +11,39 @@ namespace SSHOUSING.Infrastucture.Repository
     public class DistrictRepository : IDistrict
     {
         private readonly ApplicationDbContext _context;
-
         public DistrictRepository(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        public bool Add(District district)
+        public bool AddDistrict(District district)
         {
             _context.Districts.Add(district);
             _context.SaveChanges();
             return true;
         }
 
-        public bool Delete(int id)
+        public bool DeleteDistrict(int Id)
         {
-            var district = _context.Districts.Find(id);
-            if (district == null) return false;
-
-            _context.Districts.Remove(district);
+            var d = _context.Districts.Find(Id);
+            _context.Districts.Remove(d);
             _context.SaveChanges();
             return true;
         }
 
-        public List<District> GetAll()
+        public List<District> GetAllDistrict()
         {
             return _context.Districts.ToList();
         }
 
-        public District GetById(int id)
+        public District GetDistrictById(int Id)
         {
-            return _context.Districts.Find(id);
+            return _context.Districts.Find(Id);
         }
 
-        public bool Update(District district)
+        public bool UpdateDistrict(District district)
         {
-           _context.Districts.Update(district);
+            _context.Districts.Update(district);
             _context.SaveChanges();
             return true;
         }

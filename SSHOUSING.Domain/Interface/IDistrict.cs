@@ -9,10 +9,10 @@ namespace SSHOUSING.Domain.Interface
 {
     public interface IDistrict
     {
-        List<District> GetAll();
-        District GetById(int id);
-        bool Add(District district);
-        bool Update(District district);
-        bool Delete(int id);
+        List<District> GetAllDistrict();
+        District GetDistrictById(int Id);
+        bool AddDistrict(District district);
+        bool DeleteDistrict(int Id);
+        bool UpdateDistrict(District district);
     }
 }
