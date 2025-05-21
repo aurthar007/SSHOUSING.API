@@ -9,10 +9,10 @@ namespace SSHOUSING.Domain.Interface
 {
     public interface IState
     {
-        List<State> GetAll();
-        State GetById(int id);
-        bool Add(State state);
-        bool Update(State state);
-        bool Delete(int id);
+        List<State> GetAllState();
+        State GetStateById(int Id);
+        bool AddState(State state);
+        bool DeleteState(int Id);
+        bool UpdateState(State state);
     }
 }
