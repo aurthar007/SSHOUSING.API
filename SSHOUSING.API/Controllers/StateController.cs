@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using SSHOUSING.Domain.Entities;
 using SSHOUSING.Domain.Interface;
+using SSHOUSING.API.DTO;
+
 
 namespace SSHOUSING.API.Controllers
 {
@@ -18,7 +20,15 @@ namespace SSHOUSING.API.Controllers
         [HttpGet("GetAllState")]
         public IActionResult GetAllState()
         {
-            return Ok(_state.GetAllState());
+            var states = _state.GetAllState();
+            var StateDTO = states.Select(s => new StateDTO
+            {
+                Id = s.Id,
+                CountryId = s.CountryId,
+                Name = s.Name
+            }).ToList();
+
+            return Ok(StateDTO);
         }
 
         [HttpGet("GetStateById/{id}")]
@@ -28,26 +38,47 @@ namespace SSHOUSING.API.Controllers
             if (state == null)
                 return NotFound($"State with ID {id} not found.");
 
-            return Ok(state);
+            var StateDTO = new StateDTO
+            {
+                Id = state.Id,
+                CountryId = state.CountryId,
+                Name = state.Name
+            };
+
+            return Ok(StateDTO);
         }
 
         [HttpPut("UpdateState/{id}")]
-        public IActionResult UpdateState(int id, State state)
+        public IActionResult UpdateState(int id, StateDTO stateDto)
         {
-            if (state == null || state.Id != id)
+            if (stateDto == null || id != stateDto.Id)
                 return BadRequest("Invalid state data.");
-            var result = _state.UpdateState(state);
-            return Ok("state updated successfully.");
 
+            var state = _state.GetStateById(id);
+            if (state == null)
+                return NotFound($"State with ID {id} not found.");
+
+            state.Name = stateDto.Name;
+            state.CountryId = stateDto.CountryId;
+
+            var result = _state.UpdateState(state);
+            return Ok("State updated successfully.");
         }
 
         [HttpPost("AddState")]
-        public IActionResult AddState(State state)
+        public IActionResult AddState(StateDTO stateDto)
         {
-            if (state == null)
+            if (stateDto == null)
                 return BadRequest("Invalid state data.");
+
+            var state = new State
+            {
+                CountryId = stateDto.CountryId,
+                Name = stateDto.Name
+            };
+
             var result = _state.AddState(state);
-            return Ok("state added successfully.");
+            return Ok("State added successfully.");
         }
 
         [HttpDelete("DeleteState/{id}")]
