@@ -1,9 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using SSHOUSING.API.DTO;
 using SSHOUSING.Domain.Entities;
 using SSHOUSING.Domain.Interface;
-using SSHOUSING.API.DTO;
-
+using SSHOUSING.Infrastucture;
 
 namespace SSHOUSING.API.Controllers
 {
@@ -12,9 +11,12 @@ namespace SSHOUSING.API.Controllers
     public class StateController : ControllerBase
     {
         private readonly IState _state;
-        public StateController(IState state)
+        private readonly ApplicationDbContext _context;  
+
+        public StateController(IState state, ApplicationDbContext context)
         {
             _state = state;
+            _context = context; 
         }
 
         [HttpGet("GetAllState")]
@@ -54,6 +56,9 @@ namespace SSHOUSING.API.Controllers
             if (stateDto == null || id != stateDto.Id)
                 return BadRequest("Invalid state data.");
 
+            if (!_context.Countries.Any(c => c.Id == stateDto.CountryId))
+                return BadRequest("Invalid CountryId.");
+
             var state = _state.GetStateById(id);
             if (state == null)
                 return NotFound($"State with ID {id} not found.");
@@ -71,6 +76,9 @@ namespace SSHOUSING.API.Controllers
             if (stateDto == null)
                 return BadRequest("Invalid state data.");
 
+              if (!_context.Countries.Any(c => c.Id == stateDto.CountryId))
+                return BadRequest("Invalid CountryId.");
+
             var state = new State
             {
                 CountryId = stateDto.CountryId,
@@ -85,8 +93,10 @@ namespace SSHOUSING.API.Controllers
         public IActionResult DeleteState(int id)
         {
             var result = _state.DeleteState(id);
+            if (!result)
+                return NotFound($"State with ID {id} not found.");
+
             return Ok("State deleted successfully.");
         }
-
     }
 }
