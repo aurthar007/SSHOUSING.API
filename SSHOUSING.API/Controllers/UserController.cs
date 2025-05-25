@@ -10,14 +10,12 @@ namespace SSHOUSING.API.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUser _user;
-        private readonly IRole _role;
-        private readonly IUserRole _userRole;
+  
 
         public UserController(IUser user, IRole role, IUserRole userRole)
         {
             _user = user;
-            _role = role;
-            _userRole = userRole;
+         
         }
 
         [HttpPost("Register")]
