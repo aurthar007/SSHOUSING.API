@@ -23,6 +23,17 @@ builder.Services.AddScoped<IUser, UserRepository>();
 builder.Services.AddScoped<IRole, RoleRepository>();
 builder.Services.AddScoped<IUserRole, UserRoleRepository>();
 
+// Add CORS policy to allow React frontend on localhost:3000
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReactApp", policy =>
+    {
+        policy.WithOrigins("http://localhost:3000")  // React dev server URL
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 // Add JWT Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -56,12 +67,15 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();  // Redirect HTTP requests to HTTPS
+app.UseHttpsRedirection();
 
-app.UseAuthentication();  // Enable authentication middleware
-app.UseAuthorization();  // Enables authorization middleware
+// Use CORS policy - **important: before authentication**
+app.UseCors("AllowReactApp");
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 // Map API controllers
 app.MapControllers();
 
-app.Run();  // Start the application
+app.Run();
