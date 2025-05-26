@@ -23,16 +23,18 @@ builder.Services.AddScoped<IUser, UserRepository>();
 builder.Services.AddScoped<IRole, RoleRepository>();
 builder.Services.AddScoped<IUserRole, UserRoleRepository>();
 
-// Add CORS policy to allow React frontend on localhost:3000
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowReactApp", policy =>
+    options.AddPolicy("AllowLocalhost", policy =>
     {
-        policy.WithOrigins("http://localhost:3000")  // React dev server URL
-              .AllowAnyHeader()
-              .AllowAnyMethod();
+        policy
+            .SetIsOriginAllowed(origin => new Uri(origin).Host == "localhost")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials(); // Optional, if using cookies or auth headers
     });
 });
+
 
 // Add JWT Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -70,7 +72,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 // Use CORS policy - **important: before authentication**
-app.UseCors("AllowReactApp");
+app.UseCors("AllowLocalhost");
+
 
 app.UseAuthentication();
 app.UseAuthorization();
