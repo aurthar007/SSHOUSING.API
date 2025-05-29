@@ -11,7 +11,7 @@ using SSHOUSING.Infrastucture;
 namespace SSHOUSING.Infrastucture.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250521051605_initial")]
+    [Migration("20250526131602_initial")]
     partial class initial
     {
         /// <inheritdoc />
