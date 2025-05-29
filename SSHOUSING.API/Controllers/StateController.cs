@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using SSHOUSING.API.DTO;
 using SSHOUSING.Domain.Entities;
 using SSHOUSING.Domain.Interface;
+using SSHOUSING.Infrastucture;
 
 namespace SSHOUSING.API.Controllers
 {
@@ -10,15 +11,26 @@ namespace SSHOUSING.API.Controllers
     public class StateController : ControllerBase
     {
         private readonly IState _state;
-        public StateController(IState state)
+        private readonly ApplicationDbContext _context;  
+
+        public StateController(IState state, ApplicationDbContext context)
         {
             _state = state;
+            _context = context; 
         }
 
         [HttpGet("GetAllState")]
         public IActionResult GetAllState()
         {
-            return Ok(_state.GetAllState());
+            var states = _state.GetAllState();
+            var StateDTO = states.Select(s => new StateDTO
+            {
+                Id = s.Id,
+                CountryId = s.CountryId,
+                Name = s.Name
+            }).ToList();
+
+            return Ok(StateDTO);
         }
 
         [HttpGet("GetStateById/{id}")]
@@ -28,34 +40,63 @@ namespace SSHOUSING.API.Controllers
             if (state == null)
                 return NotFound($"State with ID {id} not found.");
 
-            return Ok(state);
+            var StateDTO = new StateDTO
+            {
+                Id = state.Id,
+                CountryId = state.CountryId,
+                Name = state.Name
+            };
+
+            return Ok(StateDTO);
         }
 
         [HttpPut("UpdateState/{id}")]
-        public IActionResult UpdateState(int id, State state)
+        public IActionResult UpdateState(int id, StateDTO stateDto)
         {
-            if (state == null || state.Id != id)
+            if (stateDto == null || id != stateDto.Id)
                 return BadRequest("Invalid state data.");
-            var result = _state.UpdateState(state);
-            return Ok("state updated successfully.");
 
+            if (!_context.Countries.Any(c => c.Id == stateDto.CountryId))
+                return BadRequest("Invalid CountryId.");
+
+            var state = _state.GetStateById(id);
+            if (state == null)
+                return NotFound($"State with ID {id} not found.");
+
+            state.Name = stateDto.Name;
+            state.CountryId = stateDto.CountryId;
+
+            var result = _state.UpdateState(state);
+            return Ok("State updated successfully.");
         }
 
         [HttpPost("AddState")]
-        public IActionResult AddState(State state)
+        public IActionResult AddState(StateDTO stateDto)
         {
-            if (state == null)
+            if (stateDto == null)
                 return BadRequest("Invalid state data.");
+
+              if (!_context.Countries.Any(c => c.Id == stateDto.CountryId))
+                return BadRequest("Invalid CountryId.");
+
+            var state = new State
+            {
+                CountryId = stateDto.CountryId,
+                Name = stateDto.Name
+            };
+
             var result = _state.AddState(state);
-            return Ok("state added successfully.");
+            return Ok("State added successfully.");
         }
 
         [HttpDelete("DeleteState/{id}")]
         public IActionResult DeleteState(int id)
         {
             var result = _state.DeleteState(id);
+            if (!result)
+                return NotFound($"State with ID {id} not found.");
+
             return Ok("State deleted successfully.");
         }
-
     }
 }

@@ -25,8 +25,11 @@ namespace SSHOUSING.Infrastucture.Repository
 
         public bool DeleteState(int Id)
         {
-            var d = _context.States.Find(Id);
-            _context.States.Remove(d);
+            var state = _context.States.Find(Id);
+            if (state == null)
+                return false; 
+
+            _context.States.Remove(state);
             _context.SaveChanges();
             return true;
         }
