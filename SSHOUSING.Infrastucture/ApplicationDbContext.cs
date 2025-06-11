@@ -24,5 +24,6 @@ namespace SSHOUSING.Infrastucture
         public DbSet<Role> Roles { get; set; }
         public DbSet<UserRole> UserRoles { get; set; }
         public DbSet<Property> Properties { get; set; }
+        public DbSet<ManageUsers> ManageUsers { get; set; }
     }
 }
