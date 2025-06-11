@@ -1,9 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SSHOUSING.API.DTO;
 using SSHOUSING.Domain.Entities;
 using SSHOUSING.Domain.Interface;
-using SSHOUSING.API.DTO;
-using SSHOUSING.Infrastucture; // Assuming ApplicationDbContext is here
-using System.Linq;
+using SSHOUSING.Infrastucture;
 
 namespace SSHOUSING.API.Controllers
 {
@@ -24,7 +23,7 @@ namespace SSHOUSING.API.Controllers
         public IActionResult GetAllDistrict()
         {
             var districts = _district.GetAllDistrict();
-            var districtDTOs = districts.Select(d => new DistrictDto
+            var DistrictDto = districts.Select(d => new DistrictDto
             {
                 Id = d.Id,
                 CountryId = d.CountryId,
@@ -32,7 +31,7 @@ namespace SSHOUSING.API.Controllers
                 Name = d.Name
             }).ToList();
 
-            return Ok(districtDTOs);
+            return Ok(DistrictDto);
         }
 
         [HttpGet("GetDistrictById/{id}")]
@@ -42,7 +41,7 @@ namespace SSHOUSING.API.Controllers
             if (district == null)
                 return NotFound($"District with ID {id} not found.");
 
-            var districtDto = new DistrictDto
+            var DistrictDto = new DistrictDto
             {
                 Id = district.Id,
                 CountryId = district.CountryId,
@@ -50,7 +49,7 @@ namespace SSHOUSING.API.Controllers
                 Name = district.Name
             };
 
-            return Ok(districtDto);
+            return Ok(DistrictDto);
         }
 
         [HttpPut("UpdateDistrict/{id}")]
@@ -59,18 +58,15 @@ namespace SSHOUSING.API.Controllers
             if (districtDto == null || id != districtDto.Id)
                 return BadRequest("Invalid district data.");
 
+            if (!_context.Countries.Any(c => c.Id == districtDto.CountryId))
+                return BadRequest("Invalid CountryId.");
+
+            if (!_context.States.Any(s => s.Id == districtDto.StateId))
+                return BadRequest("Invalid StateId.");
+
             var district = _district.GetDistrictById(id);
             if (district == null)
                 return NotFound($"District with ID {id} not found.");
-
-            var countryExists = _context.Countries.Any(c => c.Id == districtDto.CountryId);
-            var stateExists = _context.States.Any(s => s.Id == districtDto.StateId);
-
-            if (!countryExists)
-                return BadRequest($"CountryId {districtDto.CountryId} is invalid.");
-
-            if (!stateExists)
-                return BadRequest($"StateId {districtDto.StateId} is invalid.");
 
             district.Name = districtDto.Name;
             district.CountryId = districtDto.CountryId;
@@ -86,14 +82,11 @@ namespace SSHOUSING.API.Controllers
             if (districtDto == null)
                 return BadRequest("Invalid district data.");
 
-            var countryExists = _context.Countries.Any(c => c.Id == districtDto.CountryId);
-            var stateExists = _context.States.Any(s => s.Id == districtDto.StateId);
+            if (!_context.Countries.Any(c => c.Id == districtDto.CountryId))
+                return BadRequest("Invalid CountryId.");
 
-            if (!countryExists)
-                return BadRequest($"CountryId {districtDto.CountryId} is invalid.");
-
-            if (!stateExists)
-                return BadRequest($"StateId {districtDto.StateId} is invalid.");
+            if (!_context.States.Any(s => s.Id == districtDto.StateId))
+                return BadRequest("Invalid StateId.");
 
             var district = new District
             {
@@ -110,6 +103,9 @@ namespace SSHOUSING.API.Controllers
         public IActionResult DeleteDistrict(int id)
         {
             var result = _district.DeleteDistrict(id);
+            if (!result)
+                return NotFound($"District with ID {id} not found.");
+
             return Ok("District deleted successfully.");
         }
     }
