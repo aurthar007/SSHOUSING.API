@@ -1,4 +1,5 @@
 ﻿using SSHOUSING.Domain.Entities;
+using System.Collections.Generic;
 
 namespace SSHOUSING.Domain.Interface
 {
@@ -6,6 +7,6 @@ namespace SSHOUSING.Domain.Interface
     {
         bool AddUser(User user);
         User Login(string email, string password);
-
+        IEnumerable<User> GetAllUsers();
     }
 }

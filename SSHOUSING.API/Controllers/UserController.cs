@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
-using SSHOUSING.API.DTO; 
-using JWTTokendemo.DTO;  
+using SSHOUSING.API.DTO;
+using JWTTokendemo.DTO;
 using SSHOUSING.Domain.Entities;
 using SSHOUSING.Domain.Interface;
 using System.IdentityModel.Tokens.Jwt;
@@ -76,6 +76,13 @@ namespace SSHOUSING.API.Controllers
                 var jwt = new JwtSecurityTokenHandler().WriteToken(token);
                 return Ok(new { token = jwt, user = user, role = role, success = "200" });
             }
+        }
+
+        [HttpGet("GetAll")]
+        public IActionResult GetAllUsers()
+        {
+            var users = _user.GetAllUsers();
+            return Ok(users);
         }
     }
 }
