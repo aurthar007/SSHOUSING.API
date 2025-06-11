@@ -1,8 +1,10 @@
-using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using SSHOUSING.Application.Interfaces; // Correct: IPropertyRepository lives here
 using SSHOUSING.Domain.Entities;
 using SSHOUSING.Domain.Interface;
+using SSHOUSING.Infrastructure.Repository;
 using SSHOUSING.Infrastucture;
 using SSHOUSING.Infrastucture.Repository;
 using System.Text;
@@ -23,6 +25,10 @@ builder.Services.AddScoped<IUser, UserRepository>();
 builder.Services.AddScoped<IRole, RoleRepository>();
 builder.Services.AddScoped<IUserRole, UserRoleRepository>();
 
+// ? Register IPropertyRepository correctly
+builder.Services.AddScoped<IProperty, PropertyRepository>();
+
+// CORS policy
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowLocalhost", policy =>
@@ -31,12 +37,11 @@ builder.Services.AddCors(options =>
             .SetIsOriginAllowed(origin => new Uri(origin).Host == "localhost")
             .AllowAnyHeader()
             .AllowAnyMethod()
-            .AllowCredentials(); // Optional, if using cookies or auth headers
+            .AllowCredentials();
     });
 });
 
-
-// Add JWT Authentication
+// JWT Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -52,33 +57,21 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-// Add controller services (for API controllers)
 builder.Services.AddControllers();
-
-// Swagger configuration for API documentation
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
-    // Enable Swagger in development environment for API documentation
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
-
-// Use CORS policy - **important: before authentication**
 app.UseCors("AllowLocalhost");
-
-
 app.UseAuthentication();
 app.UseAuthorization();
-
-// Map API controllers
 app.MapControllers();
-
 app.Run();
