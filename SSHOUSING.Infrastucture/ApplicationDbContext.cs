@@ -28,5 +28,7 @@ namespace SSHOUSING.Infrastucture
         public DbSet<Billing> Billings { get; set; }
         public DbSet<Rule> Rules { get; set; }
         public DbSet<Notice> Notices { get; set; }
+        public DbSet<MaintenanceRequest> MaintenanceRequests { get; set; }
+
     }
 }

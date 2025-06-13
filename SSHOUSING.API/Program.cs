@@ -31,19 +31,25 @@ builder.Services.AddScoped<IManageUser, ManageUserRepository>();
 builder.Services.AddScoped<IBilling, BillingRepository>();
 builder.Services.AddScoped<IRule, RuleRepository>();
 builder.Services.AddScoped<INotice, NoticeRepository>();
+builder.Services.AddScoped<IMaintenanceRequest, MaintenanceRequestRepository>();
 
+// ----------------------
+// CORS Configuration
+// ----------------------
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowLocalhost", policy =>
+    options.AddPolicy("AllowReactApp", policy =>
     {
-        policy
-            .SetIsOriginAllowed(origin => new Uri(origin).Host == "localhost")
-            .AllowAnyHeader()
-            .AllowAnyMethod()
-            .AllowCredentials();
+        policy.WithOrigins("http://localhost:3000") // React dev server
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials(); // Only needed if you're using cookies or Authorization header
     });
 });
 
+// ----------------------
+// JWT Authentication
+// ----------------------
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -66,6 +72,9 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+// ----------------------
+// Middleware Pipeline
+// ----------------------
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -73,9 +82,11 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseCors("AllowLocalhost");
+app.UseCors("AllowReactApp"); // Must be before Auth
+
 app.UseAuthentication();
 app.UseAuthorization();
+
 app.MapControllers();
 
 app.Run();
