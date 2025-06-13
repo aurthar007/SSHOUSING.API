@@ -1,14 +1,12 @@
-﻿using SSHOUSING.Application.Interfaces; // Correct interface
-using SSHOUSING.Domain.Entities;
-using SSHOUSING.Infrastructure; // FIXED spelling from Infrastucture to Infrastructure
+﻿using SSHOUSING.Domain.Entities;
+using SSHOUSING.Domain.Interface;
 using SSHOUSING.Infrastucture;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
-namespace SSHOUSING.Infrastructure.Repository // FIXED namespace
+namespace SSHOUSING.Infrastructure.Repository
 {
-    public class PropertyRepository : IProperty // FIXED interface name
+    public class PropertyRepository : IProperty
     {
         private readonly ApplicationDbContext _context;
 
@@ -17,17 +15,15 @@ namespace SSHOUSING.Infrastructure.Repository // FIXED namespace
             _context = context;
         }
 
-        public Task<IEnumerable<Property>> GetAllAsync()
+        public List<Property> GetAllProperty()
         {
-            var properties = _context.Properties.ToList(); // Sync
-            return Task.FromResult(properties.AsEnumerable());
+            return _context.Properties.ToList(); // Synchronous method
         }
 
-        public Task<Property> AddAsync(Property property)
+        public bool AddProperty(Property property)
         {
-            _context.Properties.Add(property); // Sync
-            _context.SaveChanges();            // Sync
-            return Task.FromResult(property);
+            _context.Properties.Add(property); // Synchronous add
+            return _context.SaveChanges() > 0; // Save and return true if at least one row was affected
         }
     }
 }

@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SSHOUSING.API.DTO;
 using SSHOUSING.Domain.Entities;
-using SSHOUSING.Application.Interfaces; // ✅ Using the correct IProperty interface
+using SSHOUSING.Domain.Interface;
+using System.Linq;
 
 namespace SSHOUSING.API.Controllers
 {
@@ -9,31 +10,30 @@ namespace SSHOUSING.API.Controllers
     [ApiController]
     public class PropertyController : ControllerBase
     {
-        private readonly IProperty _repository; // ✅ Match the interface name
+        private readonly IProperty _repository;
 
-        public PropertyController(IProperty repository) // ✅ Match the constructor parameter
+        public PropertyController(IProperty repository)
         {
             _repository = repository;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public IActionResult GetAll()
         {
-            var properties = await _repository.GetAllAsync();
-
-            var result = properties.Select(p => new PropertyDto
+            var data = _repository.GetAllProperty();
+            var result = data.Select(p => new PropertyDto
             {
                 Id = p.Id,
                 Name = p.Name,
                 Location = p.Location,
                 Units = p.Units
-            });
+            }).ToList();
 
             return Ok(result);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Add([FromBody] PropertyDto dto)
+        public IActionResult Add(PropertyDto dto)
         {
             var property = new Property
             {
@@ -42,10 +42,12 @@ namespace SSHOUSING.API.Controllers
                 Units = dto.Units
             };
 
-            var added = await _repository.AddAsync(property);
+            var success = _repository.AddProperty(property);
+            if (!success)
+                return BadRequest("Failed to add property");
 
-            dto.Id = added.Id;
-            return CreatedAtAction(nameof(GetAll), new { id = dto.Id }, dto);
+            dto.Id = property.Id;
+            return Ok(dto);
         }
     }
 }
