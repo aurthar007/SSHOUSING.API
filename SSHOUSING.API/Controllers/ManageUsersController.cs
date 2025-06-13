@@ -18,7 +18,6 @@ namespace SSHOUSING.API.Controllers
             _repository = repository;
         }
 
-        // GET: api/ManageUsers/Owner
         [HttpGet("{role}")]
         public ActionResult<IEnumerable<ManageUsersDto>> GetUsersByRole(string role)
         {
@@ -35,7 +34,6 @@ namespace SSHOUSING.API.Controllers
             return Ok(userDtos);
         }
 
-        // POST: api/ManageUsers
         [HttpPost]
         public ActionResult<ManageUsersDto> AddUser([FromBody] ManageUsersDto dto)
         {
