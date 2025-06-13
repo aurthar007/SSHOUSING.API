@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SSHOUSING.Domain.Entities;
-using SSHOUSING.Domain.Interface;
 using SSHOUSING.API.DTO;
+using SSHOUSING.Domain.Entities;
+using SSHOUSING.Infrastucture;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -11,35 +11,33 @@ namespace SSHOUSING.API.Controllers
     [ApiController]
     public class ManageUsersController : ControllerBase
     {
-        private readonly IManageUser _repository;
+        private readonly ApplicationDbContext _context;
 
-        public ManageUsersController(IManageUser repository)
+        public ManageUsersController(ApplicationDbContext context)
         {
-            _repository = repository;
+            _context = context;
         }
 
         [HttpGet("{role}")]
-        public ActionResult<IEnumerable<ManageUsersDto>> GetUsersByRole(string role)
+        public IActionResult GetUsersByRole(string role)
         {
-            var users = _repository.GetUsersByRole(role);
+            var users = _context.ManageUsers
+                .Where(u => u.Role.ToLower() == role.ToLower())
+                .Select(u => new ManageUsersDto
+                {
+                    Name = u.Name,
+                    Email = u.Email,
+                    Phone = u.Phone,
+                    Role = u.Role
+                })
+                .ToList();
 
-            var userDtos = users.Select(u => new ManageUsersDto
-            {
-                Name = u.Name,
-                Email = u.Email,
-                Phone = u.Phone,
-                Role = u.Role
-            });
-
-            return Ok(userDtos);
+            return Ok(users);
         }
 
         [HttpPost]
-        public ActionResult<ManageUsersDto> AddUser([FromBody] ManageUsersDto dto)
+        public IActionResult AddUser([FromBody] ManageUsersDto dto)
         {
-            if (string.IsNullOrWhiteSpace(dto.Role))
-                return BadRequest("Role is required.");
-
             var user = new ManageUsers
             {
                 Name = dto.Name,
@@ -48,17 +46,10 @@ namespace SSHOUSING.API.Controllers
                 Role = dto.Role
             };
 
-            var newUser = _repository.AddUser(user);
+            _context.ManageUsers.Add(user);
+            _context.SaveChanges();
 
-            var newDto = new ManageUsersDto
-            {
-                Name = newUser.Name,
-                Email = newUser.Email,
-                Phone = newUser.Phone,
-                Role = newUser.Role
-            };
-
-            return CreatedAtAction(nameof(GetUsersByRole), new { role = newUser.Role }, newDto);
+            return Ok("User added successfully.");
         }
     }
 }

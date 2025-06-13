@@ -6,6 +6,6 @@ namespace SSHOUSING.Domain.Interface
     public interface IManageUser
     {
         IEnumerable<ManageUsers> GetUsersByRole(string role);
-        ManageUsers AddUser(ManageUsers user);
+        bool AddUser(ManageUsers user);
     }
 }

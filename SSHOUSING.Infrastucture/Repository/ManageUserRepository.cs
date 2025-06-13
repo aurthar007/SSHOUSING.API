@@ -22,11 +22,10 @@ namespace SSHOUSING.Infrastructure.Repository
                 .ToList();
         }
 
-        public ManageUsers AddUser(ManageUsers user)
+        public bool AddUser(ManageUsers user)
         {
             _context.ManageUsers.Add(user);
-            _context.SaveChanges();
-            return user;
+            return _context.SaveChanges() > 0;
         }
     }
 }
