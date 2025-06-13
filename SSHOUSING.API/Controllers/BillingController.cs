@@ -4,7 +4,6 @@ using SSHOUSING.Domain.Interface;
 using SSHOUSING.API.DTO;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace SSHOUSING.API.Controllers
 {
@@ -22,14 +21,15 @@ namespace SSHOUSING.API.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<BillingDto>> GetAll()
         {
-            var data = _billingRepository.GetAllAsync().Result;
-            return Ok(data.Select(ToDto));
+            var billings = _billingRepository.GetAllBilling();
+            var result = billings.Select(ToDto).ToList();
+            return Ok(result);
         }
 
         [HttpGet("{id}")]
         public ActionResult<BillingDto> Get(int id)
         {
-            var billing = _billingRepository.GetByIdAsync(id).Result;
+            var billing = _billingRepository.GetBillingById(id);
             if (billing == null) return NotFound();
             return Ok(ToDto(billing));
         }
@@ -38,27 +38,38 @@ namespace SSHOUSING.API.Controllers
         public ActionResult<BillingDto> Post(BillingDto dto)
         {
             var entity = ToEntity(dto);
-            var added = _billingRepository.AddAsync(entity).Result;
-            return CreatedAtAction(nameof(Get), new { id = added.Id }, ToDto(added));
+            var isAdded = _billingRepository.AddBilling(entity);
+
+            if (!isAdded)
+                return BadRequest("Failed to add billing record.");
+
+            dto.Id = entity.Id;
+            return CreatedAtAction(nameof(Get), new { id = dto.Id }, dto);
         }
 
         [HttpPut("{id}")]
         public ActionResult<BillingDto> Put(int id, BillingDto dto)
         {
-            if (id != dto.Id) return BadRequest();
-            var updated = _billingRepository.UpdateAsync(ToEntity(dto)).Result;
-            return Ok(ToDto(updated));
+            if (id != dto.Id) return BadRequest("ID mismatch");
+
+            var isUpdated = _billingRepository.UpdateBilling(ToEntity(dto));
+            if (!isUpdated)
+                return NotFound("Billing record not found.");
+
+            return Ok(dto);
         }
 
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            var deleted = _billingRepository.DeleteAsync(id).Result;
-            if (!deleted) return NotFound();
+            var isDeleted = _billingRepository.DeleteBilling(id);
+            if (!isDeleted)
+                return NotFound();
+
             return NoContent();
         }
 
-        // Simple mappers
+        // Mapping helpers
         private BillingDto ToDto(Billing b) => new BillingDto
         {
             Id = b.Id,

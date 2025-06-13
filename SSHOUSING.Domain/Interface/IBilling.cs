@@ -1,12 +1,14 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using SSHOUSING.Domain.Entities;
+﻿using SSHOUSING.Domain.Entities;
+using System.Collections.Generic;
 
-public interface IBilling
+namespace SSHOUSING.Domain.Interface
 {
-    Task<IEnumerable<Billing>> GetAllAsync();
-    Task<Billing> GetByIdAsync(int id);
-    Task<Billing> AddAsync(Billing billing);
-    Task<Billing> UpdateAsync(Billing billing);
-    Task<bool> DeleteAsync(int id);
+    public interface IBilling
+    {
+        List<Billing> GetAllBilling();
+        Billing GetBillingById(int id);
+        bool AddBilling(Billing billing);
+        bool UpdateBilling(Billing billing);
+        bool DeleteBilling(int id);
+    }
 }

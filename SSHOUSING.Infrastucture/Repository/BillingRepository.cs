@@ -4,50 +4,47 @@ using SSHOUSING.Domain.Interface;
 using SSHOUSING.Infrastucture;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
-public class BillingRepository : IBilling
+namespace SSHOUSING.Infrastructure.Repository
 {
-    private readonly ApplicationDbContext _context;
-
-    public BillingRepository(ApplicationDbContext context)
+    public class BillingRepository : IBilling
     {
-        _context = context;
-    }
+        private readonly ApplicationDbContext _context;
 
-    public Task<IEnumerable<Billing>> GetAllAsync()
-    {
-        var data = _context.Billings.AsEnumerable();
-        return Task.FromResult(data);
-    }
+        public BillingRepository(ApplicationDbContext context)
+        {
+            _context = context;
+        }
 
-    public Task<Billing> GetByIdAsync(int id)
-    {
-        var billing = _context.Billings.FirstOrDefault(b => b.Id == id);
-        return Task.FromResult(billing);
-    }
+        public List<Billing> GetAllBilling()
+        {
+            return _context.Billings.ToList();
+        }
 
-    public Task<Billing> AddAsync(Billing billing)
-    {
-        _context.Billings.Add(billing);
-        _context.SaveChanges();
-        return Task.FromResult(billing);
-    }
+        public Billing GetBillingById(int id)
+        {
+            return _context.Billings.FirstOrDefault(b => b.Id == id);
+        }
 
-    public Task<Billing> UpdateAsync(Billing billing)
-    {
-        _context.Billings.Update(billing);
-        _context.SaveChanges();
-        return Task.FromResult(billing);
-    }
+        public bool AddBilling(Billing billing)
+        {
+            _context.Billings.Add(billing);
+            return _context.SaveChanges() > 0;
+        }
 
-    public Task<bool> DeleteAsync(int id)
-    {
-        var billing = _context.Billings.FirstOrDefault(b => b.Id == id);
-        if (billing == null) return Task.FromResult(false);
+        public bool UpdateBilling(Billing billing)
+        {
+            _context.Billings.Update(billing);
+            return _context.SaveChanges() > 0;
+        }
 
-        _context.Billings.Remove(billing);
-        _context.SaveChanges();
-        return Task.FromResult(true);
+        public bool DeleteBilling(int id)
+        {
+            var billing = _context.Billings.FirstOrDefault(b => b.Id == id);
+            if (billing == null) return false;
+
+            _context.Billings.Remove(billing);
+            return _context.SaveChanges() > 0;
+        }
     }
 }
