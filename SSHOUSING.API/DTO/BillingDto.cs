@@ -14,7 +14,7 @@ namespace SSHOUSING.API.DTO
         public decimal Dues { get; set; }
         public decimal Rent { get; set; }
 
-        public decimal Amount { get; set; }     // Total amount billed
-        public DateTime Date { get; set; }      // Billing date
+        public decimal Amount { get; set; }     
+        public DateTime Date { get; set; }      
     }
 }
