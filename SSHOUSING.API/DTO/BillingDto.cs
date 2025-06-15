@@ -1,12 +1,20 @@
-﻿namespace SSHOUSING.API.DTO
+﻿using System;
+
+namespace SSHOUSING.API.DTO
 {
     public class BillingDto
     {
         public int Id { get; set; }
-        public string Name { get; set; }
-        public string Flat { get; set; }
-        public string RentStatus { get; set; }
-        public string ServiceFees { get; set; }
-        public string Dues { get; set; }
+
+        public required string Name { get; set; }
+        public required string Flat { get; set; }
+        public required string RentStatus { get; set; }
+
+        public decimal ServiceFees { get; set; }
+        public decimal Dues { get; set; }
+        public decimal Rent { get; set; }
+
+        public decimal Amount { get; set; }     // Total amount billed
+        public DateTime Date { get; set; }      // Billing date
     }
 }

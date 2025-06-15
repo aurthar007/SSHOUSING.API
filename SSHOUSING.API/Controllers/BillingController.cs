@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SSHOUSING.API.DTO;
+using SSHOUSING.Application.DTOs;
 using SSHOUSING.Domain.Entities;
 using SSHOUSING.Domain.Interface;
-using SSHOUSING.API.DTO;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace SSHOUSING.API.Controllers
 {
@@ -19,46 +19,78 @@ namespace SSHOUSING.API.Controllers
             _billingRepository = billingRepository;
         }
 
-        [HttpGet]
+        [HttpGet("GetAllBilling")]
         public ActionResult<IEnumerable<BillingDto>> GetAll()
         {
-            var data = _billingRepository.GetAllAsync().Result;
-            return Ok(data.Select(ToDto));
+            var billings = _billingRepository.GetAllBilling();
+            var result = billings.Select(ToDto).ToList();
+            return Ok(result);
         }
 
-        [HttpGet("{id}")]
-        public ActionResult<BillingDto> Get(int id)
+        [HttpGet("GetBillingById/{id}")]
+        public ActionResult<BillingDto> GetById(int id)
         {
-            var billing = _billingRepository.GetByIdAsync(id).Result;
-            if (billing == null) return NotFound();
+            var billing = _billingRepository.GetBillingById(id);
+            if (billing == null)
+                return NotFound($"Billing record with ID {id} not found.");
+
             return Ok(ToDto(billing));
         }
 
-        [HttpPost]
-        public ActionResult<BillingDto> Post(BillingDto dto)
+        [HttpPost("AddBilling")]
+        public ActionResult<BillingDto> AddBilling([FromBody] BillingDto dto)
         {
-            var entity = ToEntity(dto);
-            var added = _billingRepository.AddAsync(entity).Result;
-            return CreatedAtAction(nameof(Get), new { id = added.Id }, ToDto(added));
+            if (dto == null)
+                return BadRequest("Invalid billing data.");
+
+            var billing = ToEntity(dto);
+            var isAdded = _billingRepository.AddBilling(billing);
+            if (!isAdded)
+                return StatusCode(500, "Failed to add billing record.");
+
+            // Fetch saved entity to return full DTO including ID
+            var addedBilling = _billingRepository.GetAllBilling().LastOrDefault();
+            return CreatedAtAction(nameof(GetById), new { id = addedBilling?.Id ?? billing.Id }, ToDto(addedBilling ?? billing));
         }
 
-        [HttpPut("{id}")]
-        public ActionResult<BillingDto> Put(int id, BillingDto dto)
+        [HttpPut("UpdateBilling/{id}")]
+        public ActionResult UpdateBilling(int id, [FromBody] BillingDto dto)
         {
-            if (id != dto.Id) return BadRequest();
-            var updated = _billingRepository.UpdateAsync(ToEntity(dto)).Result;
-            return Ok(ToDto(updated));
+            if (dto == null || id != dto.Id)
+                return BadRequest("Invalid billing data.");
+
+            var isUpdated = _billingRepository.UpdateBilling(ToEntity(dto));
+            if (!isUpdated)
+                return NotFound($"Billing record with ID {id} not found.");
+
+            return Ok("Billing updated successfully.");
         }
 
-        [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        [HttpDelete("DeleteBilling/{id}")]
+        public IActionResult DeleteBilling(int id)
         {
-            var deleted = _billingRepository.DeleteAsync(id).Result;
-            if (!deleted) return NotFound();
-            return NoContent();
+            var isDeleted = _billingRepository.DeleteBilling(id);
+            if (!isDeleted)
+                return NotFound($"Billing record with ID {id} not found.");
+
+            return Ok("Billing deleted successfully.");
         }
 
-        // Simple mappers
+        [HttpGet("RevenueStats")]
+        public ActionResult<IEnumerable<RevenueDto>> GetMonthlyRevenueStats()
+        {
+            var stats = _billingRepository.GetMonthlyRevenueStats();
+
+            var result = stats.Select(s => new RevenueDto
+            {
+                Month = s.Month,
+                TotalRevenue = s.TotalRevenue
+            }).ToList();
+
+            return Ok(result);
+        }
+
+        // Mapping: Entity to DTO
         private BillingDto ToDto(Billing b) => new BillingDto
         {
             Id = b.Id,
@@ -66,9 +98,13 @@ namespace SSHOUSING.API.Controllers
             Flat = b.Flat,
             RentStatus = b.RentStatus,
             ServiceFees = b.ServiceFees,
-            Dues = b.Dues
+            Dues = b.Dues,
+            Rent = b.Rent,
+            Amount = b.Amount,
+            Date = b.Date
         };
 
+        // Mapping: DTO to Entity
         private Billing ToEntity(BillingDto d) => new Billing
         {
             Id = d.Id,
@@ -76,7 +112,10 @@ namespace SSHOUSING.API.Controllers
             Flat = d.Flat,
             RentStatus = d.RentStatus,
             ServiceFees = d.ServiceFees,
-            Dues = d.Dues
+            Dues = d.Dues,
+            Rent = d.Rent,
+            Amount = d.Amount,
+            Date = d.Date
         };
     }
 }

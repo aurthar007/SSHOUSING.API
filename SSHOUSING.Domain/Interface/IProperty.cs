@@ -1,15 +1,14 @@
 ﻿using SSHOUSING.Domain.Entities;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace SSHOUSING.Application.Interfaces
+namespace SSHOUSING.Domain.Interface
 {
     public interface IProperty
     {
-        Task<IEnumerable<Property>> GetAllAsync();
-        Task<Property> AddAsync(Property property);
+        List<Property> GetAllProperty();
+        Property GetPropertyById(int id);
+        bool AddProperty(Property property);
+        bool DeleteProperty(int id);
+        bool UpdateProperty(Property property);
     }
 }

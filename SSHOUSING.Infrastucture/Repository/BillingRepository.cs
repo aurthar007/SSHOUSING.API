@@ -1,53 +1,64 @@
-﻿using Microsoft.EntityFrameworkCore;
-using SSHOUSING.Domain.Entities;
-using SSHOUSING.Domain.Interface;
-using SSHOUSING.Infrastucture;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using SSHOUSING.Domain.Entities;
+using SSHOUSING.Domain.Interface;
 
-public class BillingRepository : IBilling
+namespace SSHOUSING.Infrastucture.Repository
 {
-    private readonly ApplicationDbContext _context;
-
-    public BillingRepository(ApplicationDbContext context)
+    public class BillingRepository : IBilling
     {
-        _context = context;
-    }
+        private readonly ApplicationDbContext _context;
 
-    public Task<IEnumerable<Billing>> GetAllAsync()
-    {
-        var data = _context.Billings.AsEnumerable();
-        return Task.FromResult(data);
-    }
+        public BillingRepository(ApplicationDbContext context)
+        {
+            _context = context;
+        }
 
-    public Task<Billing> GetByIdAsync(int id)
-    {
-        var billing = _context.Billings.FirstOrDefault(b => b.Id == id);
-        return Task.FromResult(billing);
-    }
+        public List<Billing> GetAllBilling()
+        {
+            return _context.Billings.ToList();
+        }
 
-    public Task<Billing> AddAsync(Billing billing)
-    {
-        _context.Billings.Add(billing);
-        _context.SaveChanges();
-        return Task.FromResult(billing);
-    }
+        public Billing GetBillingById(int id)
+        {
+            return _context.Billings.FirstOrDefault(b => b.Id == id);
+        }
 
-    public Task<Billing> UpdateAsync(Billing billing)
-    {
-        _context.Billings.Update(billing);
-        _context.SaveChanges();
-        return Task.FromResult(billing);
-    }
+        public bool AddBilling(Billing billing)
+        {
+            if (billing == null) return false;
 
-    public Task<bool> DeleteAsync(int id)
-    {
-        var billing = _context.Billings.FirstOrDefault(b => b.Id == id);
-        if (billing == null) return Task.FromResult(false);
+            _context.Billings.Add(billing);
+            return _context.SaveChanges() > 0;
+        }
 
-        _context.Billings.Remove(billing);
-        _context.SaveChanges();
-        return Task.FromResult(true);
+        public bool UpdateBilling(Billing billing)
+        {
+            var existing = _context.Billings.FirstOrDefault(b => b.Id == billing.Id);
+            if (existing == null) return false;
+
+            _context.Entry(existing).CurrentValues.SetValues(billing);
+            return _context.SaveChanges() > 0;
+        }
+
+        public bool DeleteBilling(int id)
+        {
+            var billing = _context.Billings.FirstOrDefault(b => b.Id == id);
+            if (billing == null) return false;
+
+            _context.Billings.Remove(billing);
+            return _context.SaveChanges() > 0;
+        }
+
+        // Fixed: Correct return type as per IBilling
+        public List<(string Month, decimal TotalRevenue)> GetMonthlyRevenueStats()
+        {
+            return _context.Billings
+                .GroupBy(b => b.Date.ToString("yyyy-MM"))
+                .ToList() // Materialize first to avoid expression tree errors
+                .Select(g => (Month: g.Key, TotalRevenue: g.Sum(b => b.Amount)))
+                .ToList();
+        }
     }
 }
