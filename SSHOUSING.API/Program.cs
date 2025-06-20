@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using SSHOUSING.Application.Interfaces;
 using SSHOUSING.Domain.Interface;
 using SSHOUSING.Infrastructure.Repositories;
 using SSHOUSING.Infrastructure.Repository;
