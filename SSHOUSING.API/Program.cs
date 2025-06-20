@@ -28,7 +28,7 @@ builder.Services.AddScoped<IUserRole, UserRoleRepository>();
 // ? Register IPropertyRepository correctly
 builder.Services.AddScoped<IProperty, PropertyRepository>();
 builder.Services.AddScoped<IManageUser, ManageUserRepository>();
-
+builder.Services.AddScoped<IBilling, BillingRepository>();
 // CORS policy
 builder.Services.AddCors(options =>
 {
