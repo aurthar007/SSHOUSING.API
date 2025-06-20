@@ -1,9 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
-using SSHOUSING.Domain.Entities;
+﻿using SSHOUSING.Domain.Entities;
 using SSHOUSING.Domain.Interface;
 using SSHOUSING.Infrastucture;
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using System.Linq;
 
 namespace SSHOUSING.Infrastructure.Repositories
 {
@@ -16,16 +15,16 @@ namespace SSHOUSING.Infrastructure.Repositories
             _context = context;
         }
 
-        public Task<IEnumerable<Rule>> GetAllAsync()
+        public List<Rule> GetAllRules()
         {
-            return Task.FromResult<IEnumerable<Rule>>(_context.Rules.ToList());
+            return _context.Rules.ToList();
         }
 
-        public Task<Rule> AddAsync(Rule rule)
+        public bool AddRule(Rule rule)
         {
             _context.Rules.Add(rule);
-            _context.SaveChanges();
-            return Task.FromResult(rule);
+            return _context.SaveChanges() > 0;
         }
-    }
+
+           }
 }
