@@ -39,6 +39,9 @@ namespace SSHOUSING.API.Controllers
             };
 
             var result = _user.AddUser(user);
+            if (!result)
+                return BadRequest("User registration failed.");
+
             return Ok("Registered successfully.");
         }
 
@@ -48,40 +51,72 @@ namespace SSHOUSING.API.Controllers
             var user = _user.Login(userLogin.Email, userLogin.Password);
 
             if (user == null)
-                return Ok(new { token = "", name = "", role = "", success = "400" });
-
-            var userRole = _userRole.GetById(user.Id);
-
-            if (userRole == null)
-                return Ok(new { token = "", name = "", role = "", success = "401" });
-            else
-            {
-                var role = _role.GetRoleById(userRole.RoleId);
-
-                var claims = new List<Claim>
+                return Unauthorized(new
                 {
-                    new Claim(ClaimTypes.Role, role.Name),
-                };
+                    token = "",
+                    name = "",
+                    role = "",
+                    success = "400",
+                    message = "Invalid credentials"
+                });
 
-                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
-                var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            // ✅ FIX: Lookup by UserId not UserRole.Id
+            var userRole = _userRole.GetUserRoleByUserId(user.Id);
+            if (userRole == null)
+                return NotFound(new
+                {
+                    token = "",
+                    name = user.Username,
+                    role = "",
+                    success = "401",
+                    message = "Role not assigned"
+                });
 
-                var token = new JwtSecurityToken(
-                    issuer: _configuration["Jwt:Issuer"],
-                    audience: _configuration["Jwt:Audience"],
-                    claims: claims,
-                    expires: DateTime.Now.AddHours(Convert.ToDouble(_configuration["Jwt:ExpiresInHours"])),
-                    signingCredentials: creds
-                );
-                var jwt = new JwtSecurityTokenHandler().WriteToken(token);
-                return Ok(new { token = jwt, user = user, role = role, success = "200" });
-            }
+            var role = _role.GetRoleById(userRole.RoleId);
+            if (role == null)
+                return NotFound(new
+                {
+                    token = "",
+                    name = user.Username,
+                    role = "",
+                    success = "402",
+                    message = "Role not found"
+                });
+
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Name, user.Username),
+                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.Role, role.Name)
+            };
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var token = new JwtSecurityToken(
+                issuer: _configuration["Jwt:Issuer"],
+                audience: _configuration["Jwt:Audience"],
+                claims: claims,
+                expires: DateTime.Now.AddHours(Convert.ToDouble(_configuration["Jwt:ExpiresInHours"])),
+                signingCredentials: creds
+            );
+
+            var jwt = new JwtSecurityTokenHandler().WriteToken(token);
+
+            return Ok(new
+            {
+                token = jwt,
+                name = user.Username,
+                role = role.Name,
+                success = "200"
+            });
         }
 
         [HttpGet("GetAll")]
         public IActionResult GetAllUsers()
         {
-            var users = _user.GetAllUsers();
+            var users = _user.GetAllUser();
             return Ok(users);
         }
     }

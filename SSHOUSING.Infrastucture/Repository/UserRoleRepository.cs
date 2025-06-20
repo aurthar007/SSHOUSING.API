@@ -1,5 +1,7 @@
 ﻿using SSHOUSING.Domain.Entities;
 using SSHOUSING.Domain.Interface;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SSHOUSING.Infrastucture.Repository
 {
@@ -12,9 +14,21 @@ namespace SSHOUSING.Infrastucture.Repository
             _context = context;
         }
 
-        public IEnumerable<UserRole> GetAll() => _context.UserRoles.ToList();
+        public List<UserRole> GetAllUserRole()
+        {
+            return _context.UserRoles.ToList();
+        }
 
-        public UserRole GetById(int id) => _context.UserRoles.Find(id);
+        public UserRole GetUserRoleById(int id)
+        {
+            return _context.UserRoles.Find(id);
+        }
+
+        // ✅ NEW: Get UserRole by UserId (required for login)
+        public UserRole GetUserRoleByUserId(int userId)
+        {
+            return _context.UserRoles.FirstOrDefault(ur => ur.UserId == userId);
+        }
 
         public bool Add(UserRole userRole)
         {
@@ -34,11 +48,10 @@ namespace SSHOUSING.Infrastucture.Repository
         {
             var userRole = _context.UserRoles.Find(id);
             if (userRole == null) return false;
+
             _context.UserRoles.Remove(userRole);
             _context.SaveChanges();
             return true;
         }
-
-       
     }
 }

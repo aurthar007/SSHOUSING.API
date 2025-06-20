@@ -26,7 +26,7 @@ namespace SSHOUSING.Infrastucture.Repository
             return _context.Users.FirstOrDefault(u => u.Email == email && u.Password == password);
         }
 
-        public IEnumerable<User> GetAllUsers() // ✅ Implementation of GetAllUsers
+        public List<User> GetAllUser() 
         {
             return _context.Users.ToList();
         }

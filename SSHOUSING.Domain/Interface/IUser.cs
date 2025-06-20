@@ -7,6 +7,6 @@ namespace SSHOUSING.Domain.Interface
     {
         bool AddUser(User user);
         User Login(string email, string password);
-        IEnumerable<User> GetAllUsers();
+        List<User> GetAllUser();
     }
 }
