@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using SSHOUSING.Application.Interfaces; // Correct: IPropertyRepository lives here
-using SSHOUSING.Domain.Entities;
+using SSHOUSING.Application.Interfaces;
 using SSHOUSING.Domain.Interface;
+using SSHOUSING.Infrastructure.Repositories;
 using SSHOUSING.Infrastructure.Repository;
 using SSHOUSING.Infrastucture;
 using SSHOUSING.Infrastucture.Repository;
@@ -11,38 +11,45 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
-// Configure DbContext with SQL Server connection string
+// ----------------------
+// Database Configuration
+// ----------------------
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Register repositories and interfaces for dependency injection
+// ----------------------
+// Dependency Injection
+// ----------------------
 builder.Services.AddScoped<ICountry, CountryRepository>();
 builder.Services.AddScoped<IState, StateRepository>();
 builder.Services.AddScoped<IDistrict, DistrictRepository>();
 builder.Services.AddScoped<IUser, UserRepository>();
 builder.Services.AddScoped<IRole, RoleRepository>();
 builder.Services.AddScoped<IUserRole, UserRoleRepository>();
-
-// ? Register IPropertyRepository correctly
 builder.Services.AddScoped<IProperty, PropertyRepository>();
 builder.Services.AddScoped<IManageUser, ManageUserRepository>();
 builder.Services.AddScoped<IBilling, BillingRepository>();
-// CORS policy
+builder.Services.AddScoped<IRule, RuleRepository>();
+builder.Services.AddScoped<INotice, NoticeRepository>();
+builder.Services.AddScoped<IMaintenanceRequest, MaintenanceRequestRepository>();
+
+// ----------------------
+// CORS Configuration
+// ----------------------
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowLocalhost", policy =>
+    options.AddPolicy("AllowReactApp", policy =>
     {
-        policy
-            .SetIsOriginAllowed(origin => new Uri(origin).Host == "localhost")
-            .AllowAnyHeader()
-            .AllowAnyMethod()
-            .AllowCredentials();
+        policy.WithOrigins("http://localhost:3000") // React dev server
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials(); // Only needed if you're using cookies or Authorization header
     });
 });
 
+// ----------------------
 // JWT Authentication
+// ----------------------
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -54,7 +61,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateIssuerSigningKey = true,
             ValidIssuer = builder.Configuration["Jwt:Issuer"],
             ValidAudience = builder.Configuration["Jwt:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
         };
     });
 
@@ -64,6 +72,9 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+// ----------------------
+// Middleware Pipeline
+// ----------------------
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -71,8 +82,11 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseCors("AllowLocalhost");
+app.UseCors("AllowReactApp"); // Must be before Auth
+
 app.UseAuthentication();
 app.UseAuthorization();
+
 app.MapControllers();
+
 app.Run();
