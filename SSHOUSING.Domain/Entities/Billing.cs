@@ -1,6 +1,4 @@
-﻿
-
-namespace SSHOUSING.Domain.Entities
+﻿namespace SSHOUSING.Domain.Entities
 {
     public class Billing
     {
@@ -12,7 +10,6 @@ namespace SSHOUSING.Domain.Entities
         public decimal ServiceFees { get; set; }
         public decimal Dues { get; set; }
         public decimal Rent { get; set; }
-
         public decimal Amount { get; set; }
         public DateTime Date { get; set; }
     }
