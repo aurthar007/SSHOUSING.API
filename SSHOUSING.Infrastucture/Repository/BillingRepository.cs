@@ -1,11 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
-using SSHOUSING.Domain.Entities;
-using SSHOUSING.Domain.Interface;
-using SSHOUSING.Infrastucture;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using SSHOUSING.Domain.Entities;
+using SSHOUSING.Domain.Interface;
 
-namespace SSHOUSING.Infrastructure.Repository
+namespace SSHOUSING.Infrastucture.Repository
 {
     public class BillingRepository : IBilling
     {
@@ -28,13 +27,18 @@ namespace SSHOUSING.Infrastructure.Repository
 
         public bool AddBilling(Billing billing)
         {
+            if (billing == null) return false;
+
             _context.Billings.Add(billing);
             return _context.SaveChanges() > 0;
         }
 
         public bool UpdateBilling(Billing billing)
         {
-            _context.Billings.Update(billing);
+            var existing = _context.Billings.FirstOrDefault(b => b.Id == billing.Id);
+            if (existing == null) return false;
+
+            _context.Entry(existing).CurrentValues.SetValues(billing);
             return _context.SaveChanges() > 0;
         }
 
@@ -45,6 +49,15 @@ namespace SSHOUSING.Infrastructure.Repository
 
             _context.Billings.Remove(billing);
             return _context.SaveChanges() > 0;
+        }
+
+        public List<(string Month, decimal TotalRevenue)> GetMonthlyRevenueStats()
+        {
+            return _context.Billings
+                .GroupBy(b => b.Date.ToString("yyyy-MM"))
+                .ToList()
+                .Select(g => (Month: g.Key, TotalRevenue: g.Sum(b => b.Amount)))
+                .ToList();
         }
     }
 }

@@ -1,14 +1,12 @@
-﻿using SSHOUSING.Domain.Entities;
-using System.Collections.Generic;
+﻿
+using SSHOUSING.Domain.Entities;
 
-namespace SSHOUSING.Domain.Interface
+public interface IBilling
 {
-    public interface IBilling
-    {
-        List<Billing> GetAllBilling();
-        Billing GetBillingById(int id);
-        bool AddBilling(Billing billing);
-        bool UpdateBilling(Billing billing);
-        bool DeleteBilling(int id);
-    }
+    List<Billing> GetAllBilling();
+    Billing GetBillingById(int id);
+    bool AddBilling(Billing billing);
+    bool UpdateBilling(Billing billing);
+    bool DeleteBilling(int id);
+    List<(string Month, decimal TotalRevenue)> GetMonthlyRevenueStats();
 }
