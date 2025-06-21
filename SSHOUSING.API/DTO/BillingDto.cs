@@ -7,7 +7,7 @@ namespace SSHOUSING.API.DTO
         public string Name { get; set; }
         public string Flat { get; set; }
         public string RentStatus { get; set; }
-        public decimal ServiceFees { get; set; }  // ✅ Correct type
-        public decimal Dues { get; set; }         // ✅ Correct type
+        public decimal ServiceFees { get; set; }  
+        public decimal Dues { get; set; }      
     }
 }
