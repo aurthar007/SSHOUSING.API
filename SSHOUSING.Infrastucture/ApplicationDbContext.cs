@@ -31,6 +31,7 @@ namespace SSHOUSING.Infrastucture
         public DbSet<MaintenanceRequest> MaintenanceRequests { get; set; }
         public DbSet<Document> Documents { get; set; }
         public DbSet<Message> Messages { get; set; }
+        public DbSet<Income> Incomes { get; set; }
 
     }
 }
