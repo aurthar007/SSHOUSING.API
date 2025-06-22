@@ -6,5 +6,6 @@
         public string Name { get; set; }
         public string Location { get; set; }
         public int Units { get; set; }
+        public int OccupiedUnits { get; set; }
     }
 }

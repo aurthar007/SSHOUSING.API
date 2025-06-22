@@ -213,6 +213,9 @@ namespace SSHOUSING.Infrastucture.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("OccupiedUnits")
+                        .HasColumnType("int");
+
                     b.Property<int>("Units")
                         .HasColumnType("int");
 

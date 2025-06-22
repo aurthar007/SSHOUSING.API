@@ -6,7 +6,9 @@ namespace SSHOUSING.Domain.Interface
     public interface IProperty
     {
         List<Property> GetAllProperty();
-            bool AddProperty(Property property);
-       
+        Property GetPropertyById(int id);
+        bool AddProperty(Property property);
+        bool UpdateProperty(Property property);
+        bool DeleteProperty(int id);
     }
 }

@@ -17,13 +17,42 @@ namespace SSHOUSING.Infrastructure.Repository
 
         public List<Property> GetAllProperty()
         {
-            return _context.Properties.ToList(); // Synchronous method
+            return _context.Properties.ToList();
+        }
+
+        public Property GetPropertyById(int id)
+        {
+            return _context.Properties.FirstOrDefault(p => p.Id == id);
         }
 
         public bool AddProperty(Property property)
         {
-            _context.Properties.Add(property); // Synchronous add
-            return _context.SaveChanges() > 0; // Save and return true if at least one row was affected
+            _context.Properties.Add(property);
+            return _context.SaveChanges() > 0;
+        }
+
+        public bool UpdateProperty(Property property)
+        {
+            var existing = _context.Properties.FirstOrDefault(p => p.Id == property.Id);
+            if (existing == null)
+                return false;
+
+            existing.Name = property.Name;
+            existing.Location = property.Location;
+            existing.Units = property.Units;
+            existing.OccupiedUnits = property.OccupiedUnits;
+
+            return _context.SaveChanges() > 0;
+        }
+
+        public bool DeleteProperty(int id)
+        {
+            var property = _context.Properties.FirstOrDefault(p => p.Id == id);
+            if (property == null)
+                return false;
+
+            _context.Properties.Remove(property);
+            return _context.SaveChanges() > 0;
         }
     }
 }
