@@ -34,6 +34,7 @@ builder.Services.AddScoped<IMaintenanceRequest, MaintenanceRequestRepository>();
 
 builder.Services.AddScoped<IDocument, DocumentRepository>();
 builder.Services.AddScoped<IMessage, MessageRepository>();
+builder.Services.AddScoped<IIncome, IncomeRepository>();
 // ----------------------
 // CORS Configuration
 // ----------------------
