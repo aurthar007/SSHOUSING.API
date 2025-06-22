@@ -30,6 +30,7 @@ namespace SSHOUSING.Infrastucture
         public DbSet<Notice> Notices { get; set; }
         public DbSet<MaintenanceRequest> MaintenanceRequests { get; set; }
         public DbSet<Document> Documents { get; set; }
+        public DbSet<Message> Messages { get; set; }
 
     }
 }
