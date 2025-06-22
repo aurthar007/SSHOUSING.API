@@ -15,4 +15,5 @@ public class User
 
     [Required(ErrorMessage = "Password is required.")]
     public string Password { get; set; }
+    public ICollection<Message> Messages { get; set; }
 }

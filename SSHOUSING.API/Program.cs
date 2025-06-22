@@ -33,7 +33,7 @@ builder.Services.AddScoped<INotice, NoticeRepository>();
 builder.Services.AddScoped<IMaintenanceRequest, MaintenanceRequestRepository>();
 
 builder.Services.AddScoped<IDocument, DocumentRepository>();
-
+builder.Services.AddScoped<IMessage, MessageRepository>();
 // ----------------------
 // CORS Configuration
 // ----------------------
